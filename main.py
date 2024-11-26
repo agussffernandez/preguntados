@@ -21,7 +21,13 @@ pygame.display.set_caption("Juego de preguntas")
 fuente = pygame.font.SysFont("Arial", 24)
 
 # Cargar preguntas desde archivo JSON
-def cargar_preguntas():
+def cargar_preguntas() -> list[dict]:
+    """ 
+    Carga las preguntas del archivo json
+    
+    Return:
+        (list): lista de difentes diccionarios con la info de cada pregunta 
+    """
     with open("preguntas.json", "r", encoding="utf-8") as archivo:
         data = json.load(archivo)
     return data["preguntas"]
@@ -34,20 +40,42 @@ def cargar_preguntas():
 def mostrar_texto(texto: str, x: int, y: int, color: tuple) -> None:
     """ 
     Muestra el texto renderizado en pantalla
+    
+    Args:
+        texto(str): el texto a renderizar
+        x(int): coordenada x donde se va a pegar el texto
+        y(int): coordenada y donde se va a pegar el texto
+        color(tuple): el color (en una tupla) que se le va a dar al texto
     """
     texto_renderizado = fuente.render(texto, True, color)
     pantalla.blit(texto_renderizado, (x, y))
 
 def dibujar_recuadro_pregunta(pregunta: str):
     """ 
-    Dibuja el recuadro de la pregunta en la pantalla
+    Dibuja el recuadro de la pregunta en la pantalla de borde azul con fondo blanco
+    
+    Args:
+        pregunta(str): La pregunta a dibujar/escribir en el recuadro
     """
     pygame.draw.rect(pantalla, BLUE, (50, 50, ANCHO - 100, 100), 3)
     mostrar_texto(pregunta, 60, 60, BLACK)
 
 
 # Funcion para dibujar opciones
-def dibujar_opciones(opciones: list, seleccion = None, hover = None) -> list:
+def dibujar_opciones(opciones: list, seleccion = None, hover = None) -> list[pygame.Rect]:
+    """ 
+    Dibuja las opciones de respuesta en pantalla con un recuadro azul de fondo blanco al rededor de cada opción.
+    También resalta la opción seleccionada o en hover(cuando el mousse esta sobre ella) con azul
+    
+    Args:
+        opciones (list): Lista de cadenas de texto que representan las opciones de respuesta a mostrar.
+        seleccion (str): Opción seleccionada, representada por una letra. 
+        hover (str): Opción sobre la que el mouse está pasando, representada por una letra. 
+    
+    Returns:
+        list[pygame.Rect]: Lista de objetos `pygame.Rect` que representan las posiciones y tamaños de las opciones dibujadas.
+    
+    """
     posiciones = []
     for i, opcion in enumerate(opciones):
         rectangulo_opciones = pygame.Rect(50, 160 + i * 60, ANCHO - 100, 50)
