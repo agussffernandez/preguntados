@@ -1,0 +1,19 @@
+{
+    "preguntas": [
+        {
+        "pregunta": "¿Cuál es la capital de Francia?",
+        "opciones": ["A. Berlín", "B. Madrid", "C. Paris", "D. Roma"],
+        "respuesta_correcta": "C"
+        },
+        {
+        "pregunta": "¿Qué color es el cielo?",
+        "opciones": ["A. Azul", "B. Verde", "C. Rojo", "D. Amarillo"],
+        "respuesta_correcta": "A"
+        },
+        {
+        "pregunta": "¿Cuánto es 2 + 2?",
+        "opciones": ["A. 3", "B. 4", "C. 5", "D. 6"],
+        "respuesta_correcta": "B"
+        }
+    ]
+}

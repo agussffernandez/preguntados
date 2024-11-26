@@ -1,5 +1,6 @@
 import pygame 
 import sys
+import json
 
 # Inicializar pygame
 pygame.init()
@@ -19,10 +20,16 @@ pygame.display.set_caption("Juego de preguntas")
 # Fuente
 fuente = pygame.font.SysFont("Arial", 24)
 
-# Preguntas y opciones
-pregunta = "¿Cuál es la capital de Francia?"
-opciones = ["A. Berlín", "B. Madrid", "C. Paris", "D. Roma"]
-respuesta_correcta = "C"
+# Cargar preguntas desde archivo JSON
+def cargar_preguntas():
+    with open("preguntas.json", "r", encoding="utf-8") as archivo:
+        data = json.load(archivo)
+    return data["preguntas"]
+
+
+
+# FUNCIONES
+
 
 def mostrar_texto(texto: str, x: int, y: int, color: tuple) -> None:
     """ 
@@ -31,7 +38,7 @@ def mostrar_texto(texto: str, x: int, y: int, color: tuple) -> None:
     texto_renderizado = fuente.render(texto, True, color)
     pantalla.blit(texto_renderizado, (x, y))
 
-def dibujar_recuadro_pregunta():
+def dibujar_recuadro_pregunta(pregunta: str):
     """ 
     Dibuja el recuadro de la pregunta en la pantalla
     """
@@ -40,7 +47,7 @@ def dibujar_recuadro_pregunta():
 
 
 # Funcion para dibujar opciones
-def dibujar_opciones(seleccion = None, hover = None) -> list:
+def dibujar_opciones(opciones: list, seleccion = None, hover = None) -> list:
     posiciones = []
     for i, opcion in enumerate(opciones):
         rectangulo_opciones = pygame.Rect(50, 160 + i * 60, ANCHO - 100, 50)
@@ -63,15 +70,28 @@ def dibujar_opciones(seleccion = None, hover = None) -> list:
     return posiciones
 
 
+# Guardar las preguntas cargadas en una variable
+preguntas = cargar_preguntas()
+
 
 corriendo = True
 seleccion = None  # Inicializar la variable de selección
 mostrar_resultado = False  # Variable para mostrar el resultado (Correcto/Incorrecto)
 resultado = ""  # Mensaje de resultado
 hover_opcion = None # Variable para almacenar la opción sobre la que está el mouse
+pregunta_index = 0  # Para llevar el control de la pregunta actual
+
 
 while corriendo:
     pantalla.fill(WHITE)
+    
+    # Cargar la pregunta actual y sus opciones
+    pregunta_actual = preguntas[pregunta_index]
+    pregunta = pregunta_actual["pregunta"]
+    opciones = pregunta_actual["opciones"]
+    respuesta_correcta = pregunta_actual["respuesta_correcta"]
+    
+    
     
     # Comprobación de eventos
     for event in pygame.event.get():
@@ -93,8 +113,9 @@ while corriendo:
             # Detectar sobre qué opción está el mouse (hover)
             mouse_x, mouse_y = event.pos  # Obtener las coordenadas del mouse
             hover_opcion = None  # Resetear la opción hover
-            for i, rect in enumerate(posiciones):
-                if rect.collidepoint(mouse_x, mouse_y):
+            for i, rectangulo in enumerate(posiciones):
+                # Si el mouse está sobre una opción, se almacena la opción correspondiente en hover_opcion
+                if rectangulo.collidepoint(mouse_x, mouse_y):
                     hover_opcion = chr(65 + i)  # Asigna la opción sobre la que está el mouse
                     break
     
@@ -109,8 +130,8 @@ while corriendo:
     
     # Mostrar la pregunta y opciones si no se ha mostrado el resultado
     if not mostrar_resultado:
-        dibujar_recuadro_pregunta()
-        posiciones = dibujar_opciones(seleccion, hover_opcion)  # Pasar hover_opcion al dibujar opciones
+        dibujar_recuadro_pregunta(pregunta)
+        posiciones = dibujar_opciones(opciones, seleccion, hover_opcion)  
     
     # Si mostrar_resultado es True, significa que el jugador ya ha seleccionado una opción y se debe mostrar el resultado
     else:
@@ -121,6 +142,14 @@ while corriendo:
         # Reiniciar el estado para permitir la siguiente selección
         mostrar_resultado = False  # Volver a permitir que se seleccionen opciones
         seleccion = None  # Limpiar la selección anterior
+        
+        # Avanza a la siguiente pregunta
+        pregunta_index += 1
+        
+        # Si no hay mas preguntas, termina el juego
+        if pregunta_index >= len(preguntas):
+            corriendo = False
+            print("Fin del juego")
     
     # Actualizar la pantalla
     pygame.display.flip()
